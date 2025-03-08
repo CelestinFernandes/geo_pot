@@ -1,0 +1,111 @@
+/* src/App.css */
+.App {
+  text-align: center;
+}
+
+/* Map container styles */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-div-icon {
+  background: none !important;
+  border: none !important;
+}
+
+/* Controls container */
+.map-controls {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  backdrop-filter: blur(5px);
+}
+
+/* Base button styles */
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Select element styles */
+select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 100%;
+}
+
+/* Search component styles */
+.search-container {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-container input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.search-container button {
+  background: #3498db;
+  color: white;
+}
+
+.search-container button:hover {
+  background: #2980b9;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Delete buttons */
+button[onClick*="deleteLast"] {
+  background: #f0f0f0;
+  color: #333;
+}
+
+button[onClick*="deleteAll"] {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .map-controls {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .search-container input,
+  select {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  button {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+}
