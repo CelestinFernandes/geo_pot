@@ -1,37 +1,53 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import SearchLocation from './SearchLocation';
-
+"use client"
+import { useState, useCallback, useRef, forwardRef, useImperativeHandle } from "react"
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet"
+import L from "leaflet"
+import "leaflet/dist/leaflet.css"
+import SearchLocation from "./SearchLocation"
 // Fix leaflet default icons
-delete L.Icon.Default.prototype._getIconUrl;
+delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/images/marker-icon-2x.png',
-  iconUrl: '/images/marker-icon.png',
-  shadowUrl: '/images/marker-shadow.png',
-});
+  iconRetinaUrl: "/images/marker-icon-2x.png",
+  iconUrl: "/images/marker-icon.png",
+  shadowUrl: "/images/marker-shadow.png",
+})
 
-const MapComponent = () => {
-  const [markers, setMarkers] = useState([]);
-  const [selectedType, setSelectedType] = useState('crack');
-  const [mapCenter] = useState([19.125, 72.9]);
-  const mapRef = useRef();
+const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDeletePhoto }, ref) => {
+  const [markers, setMarkers] = useState([])
+  const [selectedType, setSelectedType] = useState("crack")
+  const [mapCenter] = useState([19.125, 72.9])
+  const mapRef = useRef()
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    flyToLocation: (location) => {
+      if (mapRef.current) {
+        mapRef.current.setView(location, 16)
+      }
+    },
+  }))
 
   // Custom icons
   const crackIcon = L.divIcon({
-    className: 'custom-icon',
+    className: "custom-icon",
     html: '<div style="color: #2ecc71; font-size: 32px;">🚧</div>',
     iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
+    iconAnchor: [16, 16],
+  })
 
   const potholeIcon = L.divIcon({
-    className: 'custom-icon',
+    className: "custom-icon",
     html: '<div style="color: #e74c3c; font-size: 32px;">⚠️</div>',
     iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
+    iconAnchor: [16, 16],
+  })
+
+  const photoIcon = L.divIcon({
+    className: "custom-icon",
+    html: '<div style="color: #3498db; font-size: 32px;">📷</div>',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  })
 
   // Handle map click
   const MapClickHandler = () => {
@@ -40,73 +56,91 @@ const MapComponent = () => {
         const newMarker = {
           position: [e.latlng.lat, e.latlng.lng],
           type: selectedType,
-          id: Date.now()
-        };
-        setMarkers(prev => [...prev, newMarker]);
-      }
-    });
-    return null;
-  };
+          id: Date.now(),
+        }
+        setMarkers((prev) => [...prev, newMarker])
+      },
+    })
+    return null
+  }
 
   // Handle search results
   const handleSearchResult = (coords, displayName) => {
-    const map = mapRef.current;
-    map.setView(coords, 16);
-    
+    const map = mapRef.current
+    map.setView(coords, 16)
+
     // Add temporary marker
     const tempMarker = L.marker(coords, {
       icon: L.divIcon({
-        className: 'search-marker',
+        className: "search-marker",
         html: '<div style="color: #3498db; font-size: 32px;">📍</div>',
         iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      })
-    }).addTo(map);
-    
-    tempMarker.bindPopup(`<b>Search Result:</b><br>${displayName}`).openPopup();
-    
+        iconAnchor: [16, 16],
+      }),
+    }).addTo(map)
+
+    tempMarker.bindPopup(`<b>Search Result:</b><br>${displayName}`).openPopup()
+
     // Remove after 5 seconds
-    setTimeout(() => map.removeLayer(tempMarker), 5000);
-  };
+    setTimeout(() => map.removeLayer(tempMarker), 5000)
+  }
 
   // Delete markers functions
   const deleteMarker = useCallback((id) => {
-    setMarkers(prev => prev.filter(marker => marker.id !== id));
-  }, []);
+    setMarkers((prev) => prev.filter((marker) => marker.id !== id))
+  }, [])
 
   const deleteLastMarker = useCallback(() => {
-    setMarkers(prev => prev.slice(0, -1));
-  }, []);
+    // If there are photo markers, delete the last one first
+    if (capturedPhotos.length > 0) {
+      onDeleteLastPhoto()
+    } else {
+      // Otherwise delete the last regular marker
+      setMarkers((prev) => prev.slice(0, -1))
+    }
+  }, [capturedPhotos.length, onDeleteLastPhoto])
 
   const deleteAllMarkers = useCallback(() => {
-    setMarkers([]);
-  }, []);
+    setMarkers([])
+  }, [])
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      <MapContainer
-        center={mapCenter}
-        zoom={13}
-        style={{ height: '100%', width: '100%' }}
-        tap={false}
-        ref={mapRef}
-      >
+    <div className="map-container">
+      <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }} tap={false} ref={mapRef}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
+          attribution="&copy; OpenStreetMap contributors"
         />
-        
+
         <MapClickHandler />
-        
-        {markers.map(marker => (
-          <Marker
-            key={marker.id}
-            position={marker.position}
-            icon={marker.type === 'crack' ? crackIcon : potholeIcon}
-          >
+
+        {markers.map((marker) => (
+          <Marker key={marker.id} position={marker.position} icon={marker.type === "crack" ? crackIcon : potholeIcon}>
             <Popup>
               <b>{marker.type.charAt(0).toUpperCase() + marker.type.slice(1)}</b>
               <button onClick={() => deleteMarker(marker.id)}>Delete</button>
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* Photo markers */}
+        {capturedPhotos.map((photo) => (
+          <Marker key={`photo-${photo.id}`} position={photo.location} icon={photoIcon}>
+            <Popup>
+              <div className="photo-popup">
+                <img
+                  src={photo.image || "/placeholder.svg"}
+                  alt="Captured"
+                  style={{ width: "150px", height: "auto", marginBottom: "8px" }}
+                />
+                <p>
+                  <b>Photo captured at:</b>
+                </p>
+                <p>Lat: {photo.location[0].toFixed(6)}</p>
+                <p>Lng: {photo.location[1].toFixed(6)}</p>
+                <p>{photo.timestamp}</p>
+                <button onClick={() => onDeletePhoto(photo.id)}>Delete</button>
+              </div>
             </Popup>
           </Marker>
         ))}
@@ -115,11 +149,7 @@ const MapComponent = () => {
       {/* Controls */}
       <div className="map-controls">
         <SearchLocation onSearch={handleSearchResult} />
-        <select 
-          value={selectedType} 
-          onChange={(e) => setSelectedType(e.target.value)}
-          style={{ marginBottom: '10px' }}
-        >
+        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} style={{ marginBottom: "10px" }}>
           <option value="crack">🚧 Crack</option>
           <option value="pothole">⚠️ Pothole</option>
         </select>
@@ -127,7 +157,6 @@ const MapComponent = () => {
         <button onClick={deleteAllMarkers}>🧹 Clear All</button>
       </div>
     </div>
-  );
-};
-
-export default MapComponent;
+  )
+})
+export default MapComponent

@@ -1,59 +1,54 @@
-import React, { useState } from 'react';
-import L from 'leaflet';
+"use client"
 
+import { useState } from "react"
 const SearchLocation = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
-  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState([])
+  const [error, setError] = useState("")
+
+  const handleInputChange = (event) => {
+    setSearchQuery(event.target.value)
+    setError("") // Clear any previous errors
+  }
 
   const handleSearch = async () => {
-    try {
-      // Clear previous errors
-      setError('');
-
-      // Try to parse coordinates directly
-      const coordRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
-      if (coordRegex.test(query)) {
-        const [lat, lng] = query.split(',').map(Number);
-        if (Math.abs(lat) > 90 || Math.abs(lng) > 180) {
-          throw new Error('Invalid coordinates (Lat: -90 to 90, Lng: -180 to 180)');
-        }
-        onSearch([lat, lng], query);
-        return;
-      }
-
-      // Geocode using OpenStreetMap Nominatim
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-      );
-      
-      if (!response.ok) throw new Error('Network response was not ok');
-      
-      const data = await response.json();
-      
-      if (data.length === 0) {
-        throw new Error('Location not found');
-      }
-
-      const firstResult = data[0];
-      onSearch([parseFloat(firstResult.lat), parseFloat(firstResult.lon)], firstResult.display_name);
-    } catch (err) {
-      setError(err.message || 'Failed to find location. Please try again.');
+    if (!searchQuery.trim()) {
+      setError("Please enter a location to search.")
+      return
     }
-  };
+
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${searchQuery}&format=json`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setSearchResults(data)
+
+      if (data.length === 0) {
+        setError("No results found for this location.")
+      } else {
+        // Take the first result and pass it to the parent component
+        const firstResult = data[0]
+        const coords = [Number.parseFloat(firstResult.lat), Number.parseFloat(firstResult.lon)]
+        const displayName = firstResult.display_name
+        onSearch(coords, displayName)
+      }
+    } catch (error) {
+      console.error("Search error:", error)
+      setError("Failed to fetch search results. Please try again.")
+    }
+  }
 
   return (
     <div className="search-container">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Enter address or coordinates (lat,lng)"
-        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-      />
+      <input type="text" placeholder="Search Location" value={searchQuery} onChange={handleInputChange} />
       <button onClick={handleSearch}>Search</button>
       {error && <div className="error-message">{error}</div>}
     </div>
-  );
-};
+  )
+}
 
-export default SearchLocation;
+export default SearchLocation
