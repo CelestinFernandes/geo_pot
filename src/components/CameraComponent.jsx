@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+
 const CameraComponent = ({ onPhotoCapture }) => {
   const [hasPermission, setHasPermission] = useState(null)
   const [isCameraActive, setIsCameraActive] = useState(false)
@@ -36,60 +37,71 @@ const CameraComponent = ({ onPhotoCapture }) => {
     return () => clearInterval(locationInterval)
   }, [])
 
-  // Handle video stream when camera becomes active
+  // Handle video stream initialization
   useEffect(() => {
-    if (isCameraActive && videoRef.current) {
-      videoRef.current.srcObject = streamRef.current
-      videoRef.current.play().catch(error => {
-        console.error("Error playing video stream:", error)
-      })
+    const initializeVideo = async () => {
+      if (isCameraActive && videoRef.current && !videoRef.current.srcObject) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+          })
+          
+          streamRef.current = stream
+          videoRef.current.srcObject = stream
+          videoRef.current.play().catch(error => {
+            console.error("Error playing video stream:", error)
+          })
+        } catch (err) {
+          console.error("Error accessing camera:", err)
+          setHasPermission(false)
+          setIsCameraActive(false)
+        }
+      }
     }
+
+    initializeVideo()
   }, [isCameraActive])
 
-  // Clean up camera stream when component unmounts
+  // Cleanup camera stream
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop())
+        streamRef.current.getTracks().forEach(track => track.stop())
+        streamRef.current = null
       }
     }
   }, [])
 
-  const requestCameraPermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      })
-
-      streamRef.current = stream
-      setHasPermission(true)
-      setIsCameraActive(true)
-      
-    } catch (err) {
-      console.error("Error accessing camera:", err)
-      setHasPermission(false)
-    }
-  }
-
   const startCamera = () => {
-    if (hasPermission === null) {
-      requestCameraPermission()
-    } else if (hasPermission) {
-      setIsCameraActive(true)
+    if (hasPermission === false) return
+    
+    // Reset existing stream if present
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current = null
     }
+
+    setIsCameraActive(true)
+    setHasPermission(null)
   }
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop())
+      streamRef.current.getTracks().forEach(track => track.stop())
       streamRef.current = null
     }
     setIsCameraActive(false)
+    setHasPermission(null)
   }
 
   const capturePhoto = () => {
     if (!currentLocation) {
       alert("Location not available. Please enable location services and try again.")
+      return
+    }
+
+    if (!videoRef.current || !streamRef.current) {
+      alert("Camera not ready. Please try again.")
       return
     }
 
@@ -131,10 +143,20 @@ const CameraComponent = ({ onPhotoCapture }) => {
         </div>
       ) : (
         <div className="camera-active">
-          <video ref={videoRef} autoPlay playsInline className="camera-preview" />
+          <video 
+            ref={videoRef} 
+            autoPlay 
+            playsInline 
+            className="camera-preview"
+            muted // Add muted attribute for automatic play
+          />
 
           <div className="camera-controls">
-            <button className="capture-button" onClick={capturePhoto} disabled={isCapturing || !currentLocation}>
+            <button 
+              className="capture-button" 
+              onClick={capturePhoto} 
+              disabled={isCapturing || !currentLocation}
+            >
               {isCapturing ? "Processing..." : "Take Photo"}
             </button>
 
@@ -155,4 +177,5 @@ const CameraComponent = ({ onPhotoCapture }) => {
     </div>
   )
 }
+
 export default CameraComponent

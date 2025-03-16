@@ -46,6 +46,11 @@
   border: none !important;
 }
 
+.control-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
 /* Controls container */
 .map-controls {
   position: absolute;
@@ -58,6 +63,9 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
   max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Base button styles */
@@ -78,7 +86,6 @@ select {
   width: 100%;
 }
 
-/* Search component styles */
 .search-container {
   margin-bottom: 15px;
   display: flex;
@@ -87,6 +94,7 @@ select {
 }
 
 .search-container input {
+  flex: 1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -99,6 +107,25 @@ select {
 }
 
 .search-container button:hover {
+  background: #2980b9;
+}
+.search-input-group {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.search-icon-button {
+  padding: 8px 12px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-icon-button:hover {
   background: #2980b9;
 }
 
@@ -158,9 +185,12 @@ button[onClick*="deleteAll"] {
 .camera-preview {
   width: 100%;
   max-width: 500px;
+  height: 375px;
   border-radius: 10px;
   margin-bottom: 15px;
-  background-color: #000;
+  object-fit: cover;
+  transform: scaleX(-1); 
+  background: #000; 
 }
 
 .camera-controls {

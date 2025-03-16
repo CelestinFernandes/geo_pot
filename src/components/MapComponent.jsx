@@ -149,10 +149,11 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
       {/* Controls */}
       <div className="map-controls">
         <SearchLocation onSearch={handleSearchResult} />
-        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} style={{ marginBottom: "10px" }}>
+        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
           <option value="crack">🚧 Crack</option>
           <option value="pothole">⚠️ Pothole</option>
         </select>
+        <div className="control-buttons"></div>
         <button onClick={deleteLastMarker}>🗑️ Delete Last</button>
         <button onClick={deleteAllMarkers}>🧹 Clear All</button>
       </div>
