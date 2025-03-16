@@ -19,7 +19,7 @@ function App() {
 
     setCapturedPhotos((prev) => [...prev, newPhoto])
 
-    // Scroll to map and focus on the new location
+    // Scroll to map + focus on new location
     if (mapRef.current && location) {
       mapRef.current.flyToLocation(location)
     }

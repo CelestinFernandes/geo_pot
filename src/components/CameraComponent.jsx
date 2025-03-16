@@ -36,6 +36,16 @@ const CameraComponent = ({ onPhotoCapture }) => {
     return () => clearInterval(locationInterval)
   }, [])
 
+  // Handle video stream when camera becomes active
+  useEffect(() => {
+    if (isCameraActive && videoRef.current) {
+      videoRef.current.srcObject = streamRef.current
+      videoRef.current.play().catch(error => {
+        console.error("Error playing video stream:", error)
+      })
+    }
+  }, [isCameraActive])
+
   // Clean up camera stream when component unmounts
   useEffect(() => {
     return () => {
@@ -48,17 +58,13 @@ const CameraComponent = ({ onPhotoCapture }) => {
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: { facingMode: "environment" }
       })
 
-      setHasPermission(true)
       streamRef.current = stream
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
-
+      setHasPermission(true)
       setIsCameraActive(true)
+      
     } catch (err) {
       console.error("Error accessing camera:", err)
       setHasPermission(false)
@@ -89,7 +95,6 @@ const CameraComponent = ({ onPhotoCapture }) => {
 
     setIsCapturing(true)
 
-    // Create a canvas element to capture the current video frame
     const canvas = document.createElement("canvas")
     const video = videoRef.current
 
@@ -99,13 +104,9 @@ const CameraComponent = ({ onPhotoCapture }) => {
     const ctx = canvas.getContext("2d")
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-    // Convert to data URL
     const imageDataUrl = canvas.toDataURL("image/jpeg")
-
-    // Pass the captured photo and location to parent component
     onPhotoCapture(imageDataUrl, currentLocation)
 
-    // Show success message
     const successMessage = document.createElement("div")
     successMessage.className = "capture-success"
     successMessage.textContent = "Photo captured successfully!"

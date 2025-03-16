@@ -49,7 +49,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     iconAnchor: [16, 16],
   })
 
-  // Handle map click
+  // map click part
   const MapClickHandler = () => {
     useMapEvents({
       click: (e) => {
@@ -64,7 +64,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     return null
   }
 
-  // Handle search results
+  // search results
   const handleSearchResult = (coords, displayName) => {
     const map = mapRef.current
     map.setView(coords, 16)
