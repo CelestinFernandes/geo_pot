@@ -3,12 +3,11 @@
 import { useState } from "react"
 const SearchLocation = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState([])
   const [error, setError] = useState("")
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value)
-    setError("") // Clear any previous errors
+    setError("")
   }
 
   const handleSearch = async () => {
@@ -19,18 +18,12 @@ const SearchLocation = ({ onSearch }) => {
 
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${searchQuery}&format=json`)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+      
       const data = await response.json()
-      setSearchResults(data)
-
       if (data.length === 0) {
         setError("No results found for this location.")
       } else {
-        // Take the first result and pass it to the parent component
         const firstResult = data[0]
         const coords = [Number.parseFloat(firstResult.lat), Number.parseFloat(firstResult.lon)]
         const displayName = firstResult.display_name
@@ -44,8 +37,18 @@ const SearchLocation = ({ onSearch }) => {
 
   return (
     <div className="search-container">
-      <input type="text" placeholder="Search Location" value={searchQuery} onChange={handleInputChange} />
-      <button onClick={handleSearch}>Search</button>
+      <div className="search-input-group">
+        <input 
+          type="text" 
+          placeholder="Search Location" 
+          value={searchQuery} 
+          onChange={handleInputChange}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+        />
+        <button onClick={handleSearch} className="search-icon-button">
+          🔍
+        </button>
+      </div>
       {error && <div className="error-message">{error}</div>}
     </div>
   )
