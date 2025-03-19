@@ -126,27 +126,21 @@ const CameraComponent = ({ onPhotoCapture }) => {
 
       {!isCameraActive ? (
         <div className="camera-inactive">
-          <button className="camera-button" onClick={startCamera}>
-            📷 Open Camera
-          </button>
-          <p className="camera-info">Tap to open camera and capture location</p>
+          <button className="camera-button" onClick={startCamera}> 📷 Open Camera </button>
+          <p className="camera-info">Click to open camera and capture your current location</p>
         </div>
       ) : (
         <div className="camera-active">
           <video ref={videoRef} autoPlay playsInline className="camera-preview" muted />
           <div className="camera-controls">
             <button className="capture-button" onClick={capturePhoto} disabled={isCapturing || !currentLocation}>
-              {isCapturing ? "Processing..." : "📸 Capture"}
+              {isCapturing ? "Processing..." : "Take Photo"}
             </button>
-            <button className="close-camera" onClick={stopCamera}>
-              ❌ Close
-            </button>
+            <button className="close-camera" onClick={stopCamera}> Close Camera </button>
           </div>
           {currentLocation && (
             <div className="location-info">
-              <p>
-                Location: {currentLocation[0].toFixed(6)}, {currentLocation[1].toFixed(6)}
-              </p>
+              <p> Current Location: {currentLocation[0].toFixed(15)}, {currentLocation[1].toFixed(15)} </p>
             </div>
           )}
         </div>

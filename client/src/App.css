@@ -1,4 +1,3 @@
-/* App container with scrollable layout */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -10,7 +9,7 @@
 /* Map section */
 .map-section {
   width: 100%;
-  height: 60vh;
+  height: 50vh; /* Reduced from 60vh for better mobile balance */
   position: relative;
   z-index: 1;
 }
@@ -24,7 +23,7 @@
 
 /* Content section (scrollable) */
 .content-section {
-  padding: 20px;
+  padding: clamp(10px, 5vw, 20px); /* Responsive padding */
   flex: 1;
   overflow-y: auto;
   background-color: #f8f9fa;
@@ -49,11 +48,11 @@
   right: 10px;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.9);
-  padding: 15px;
+  padding: clamp(8px, 3vw, 15px); /* Responsive padding */
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
-  max-width: 300px;
+  max-width: min(300px, 80vw); /* Responsive width */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -61,12 +60,13 @@
 
 /* Base button styles */
 button {
-  padding: 8px 16px;
+  padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 16px); /* Responsive padding */
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 5px 0;
+  font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
 }
 
 /* Select element styles */
@@ -82,6 +82,7 @@ select {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .search-container input {
@@ -89,7 +90,7 @@ select {
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
 }
 
 .search-container button {
@@ -105,6 +106,7 @@ select {
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .search-icon-button {
@@ -130,43 +132,47 @@ select {
 /* Camera component styles */
 .camera-component {
   margin: 20px 0;
-  padding: 15px;
+  padding: clamp(10px, 3vw, 15px); /* Responsive padding */
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .camera-inactive {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: clamp(10px, 5vw, 20px); /* Responsive padding */
 }
 
 .camera-button {
   background: #3498db;
   color: white;
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: clamp(8px, 3vw, 12px) clamp(16px, 5vw, 24px); /* Responsive padding */
+  font-size: clamp(14px, 4vw, 16px); /* Responsive font size */
   border-radius: 50px;
   margin-bottom: 15px;
 }
 
 .camera-info {
   color: #666;
-  font-size: 14px;
+  font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
+  text-align: center;
 }
 
 .camera-active {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .camera-preview {
   width: 100%;
-  max-width: 500px;
-  height: 375px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3; /* Maintain aspect ratio instead of fixed height */
   border-radius: 10px;
   margin-bottom: 15px;
   object-fit: cover;
@@ -178,6 +184,8 @@ select {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
+  width: 100%;
+  justify-content: center;
 }
 
 .capture-button {
@@ -201,9 +209,8 @@ select {
   background: #f8f9fa;
   padding: 10px;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
   width: 100%;
-  max-width: 500px;
   text-align: center;
 }
 
@@ -214,16 +221,18 @@ select {
   border-radius: 5px;
   margin-bottom: 15px;
   text-align: center;
+  font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
 }
 
 /* Photo gallery */
 .photo-gallery {
   margin-top: 30px;
+  width: 100%;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); /* Responsive grid */
   gap: 15px;
   margin-top: 15px;
 }
@@ -243,14 +252,14 @@ select {
 
 .gallery-info {
   padding: 10px;
-  font-size: 12px;
+  font-size: clamp(11px, 3vw, 12px); /* Responsive font size */
   color: #666;
 }
 
 .delete-photo-btn {
   background: #e74c3c;
   color: white;
-  font-size: 12px;
+  font-size: clamp(11px, 3vw, 12px); /* Responsive font size */
   padding: 5px 10px;
   margin-top: 5px;
 }
@@ -310,7 +319,7 @@ select {
   }
 
   .map-section {
-    width: 80%;
+    width: 60%;
     height: 100vh;
     border-right: 2px solid #ddd;
     border-bottom: none;
@@ -328,106 +337,69 @@ select {
   }
 }
 
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-  }
-
-  .map-section {
-    height: 50vh;
-    width: 100%;
-    border-right: none;
-    border-bottom: 2px solid #ddd;
-  }
-
-  .content-section {
-    width: 100%;
-    height: auto;
-    overflow-y: visible;
-    padding: 15px;
-  }
-
+@media (max-width: 767px) {
   .map-controls {
-    position: absolute;
-    top: 10px;
+    top: auto;
+    bottom: 10px;
     left: 10px;
     right: 10px;
-    bottom: auto;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
     max-width: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.95); /* More opaque for better visibility */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for controls */
     gap: 8px;
-    align-items: center;
-  }
-
-  .map-controls > * {
-    flex: 1 1 auto;
-    min-width: calc(50% - 4px);
-    margin: 0;
+    padding: 10px;
   }
 
   .search-container {
-    flex: 1 1 80%;
-    margin-bottom: 8px;
+    grid-column: 1 / -1; /* Full width for search */
+    margin-bottom: 5px;
   }
 
-  .search-input-group {
-    display: flex;
-    gap: 4px;
+  select {
+    grid-column: 1 / -1; /* Full width for select */
   }
 
-  .search-container input {
+  .map-section {
+    height: 60vh; /* More map visibility on mobile */
+  }
+
+  .camera-preview {
+    aspect-ratio: 4 / 3; /* Maintain aspect ratio */
+    max-height: 50vh; /* Limit height on mobile */
+  }
+
+  .camera-controls {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .camera-controls button {
     flex: 1;
+    max-width: 48%;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .map-section {
+    height: 50vh; /* Slightly smaller map on very small devices */
   }
 
-  .search-icon-button {
+  .map-controls {
     padding: 8px;
-    font-size: 14px;
   }
 
-  select,
-  button {
-    padding: 8px;
-    font-size: 14px;
+  .map-controls button {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 
   .camera-component {
-    margin: 10px 0;
     padding: 10px;
   }
 
   .camera-preview {
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-  }
-
-  .camera-controls {
-    flex-direction: column;
-    width: 90%;
-  }
-
-  .camera-controls button {
-    width: 100%;
-    margin-bottom: 8px;
-  }
-
-  .photo-gallery {
-    margin-top: 20px;
-  }
-
-  .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-  }
-
-  .gallery-item img {
-    height: 120px;
+    max-height: 40vh;
   }
 }

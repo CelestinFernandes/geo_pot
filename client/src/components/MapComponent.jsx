@@ -29,10 +29,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
   const mapRef = useRef()
 
   const icons = {
-    crack: createIcon("🚧"),
-    pothole: createIcon("⚠️"),
-    photo: createIcon("📷"),
-    search: createIcon("📍"),
+    crack: createIcon("🚧"), pothole: createIcon("⚠️"), photo: createIcon("📷"), search: createIcon("📍"),
   }
 
   useImperativeHandle(ref, () => ({
@@ -41,10 +38,12 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     },
   }))
 
+  // Modify the MapClickHandler component to make it more mobile-friendly
   const MapClickHandler = () => {
     useMapEvents({
       click: (e) => {
-        if (!e.originalEvent.propagatedFromMarker) {
+        // Check if click came from a marker and not a mobile touch event meant for panning
+        if (!e.originalEvent.propagatedFromMarker && !e.originalEvent._simulated) {
           setMarkers((prev) => [
             ...prev,
             {
@@ -83,9 +82,17 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     }
   }, [capturedPhotos.length, onDeleteLastPhoto])
 
+  // Update the map controls rendering to be more mobile-friendly
   return (
     <div className="map-container">
-      <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }} tap={false} ref={mapRef}>
+      <MapContainer
+        center={mapCenter}
+        zoom={13}
+        style={{ height: "100%", width: "100%" }}
+        tap={false}
+        ref={mapRef}
+        zoomControl={window.innerWidth > 768} // Hide default zoom controls on mobile
+      >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
@@ -110,9 +117,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
                   e.nativeEvent.stopImmediatePropagation()
                   deleteMarker(marker.id)
                 }}
-              >
-                Delete
-              </button>
+              > Delete </button>
             </Popup>
           </Marker>
         ))}
@@ -121,14 +126,10 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
           <Marker key={`photo-${photo.id}`} position={photo.location} icon={icons.photo}>
             <Popup>
               <div className="photo-popup">
-                <img
-                  src={photo.image || "/placeholder.svg"}
-                  alt="Captured"
+                <img src={photo.image || "/placeholder.svg"} alt="Captured"
                   style={{ width: "150px", height: "auto", marginBottom: "8px" }}
                 />
-                <p>
-                  <b>Photo captured at:</b>
-                </p>
+                <p> <b>Photo captured at:</b> </p>
                 <p>Lat: {photo.location[0].toFixed(6)}</p>
                 <p>Lng: {photo.location[1].toFixed(6)}</p>
                 <p>{photo.timestamp}</p>
@@ -145,12 +146,11 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
           <option value="crack">🚧 Crack</option>
           <option value="pothole">⚠️ Pothole</option>
         </select>
-        <button onClick={deleteLastMarker}>🗑️ Last</button>
-        <button onClick={() => setMarkers([])}>🧹 All</button>
+        <button onClick={deleteLastMarker}>🗑️ Delete Last</button>
+        <button onClick={() => setMarkers([])}>🧹 Clear All</button>
       </div>
     </div>
   )
 })
 
 export default MapComponent
-
