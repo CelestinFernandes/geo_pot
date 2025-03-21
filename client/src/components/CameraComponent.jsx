@@ -85,7 +85,7 @@ const CameraComponent = ({ onPhotoCapture }) => {
     setHasPermission(null)
   }
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (!currentLocation) {
       alert("Location not available. Please enable location services and try again.")
       return
@@ -107,17 +107,40 @@ const CameraComponent = ({ onPhotoCapture }) => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
     const imageDataUrl = canvas.toDataURL("image/jpeg")
-    onPhotoCapture(imageDataUrl, currentLocation)
+    const base64Image = imageDataUrl.split(",")[1]; // Get base64 string
 
-    const successMessage = document.createElement("div")
-    successMessage.className = "capture-success"
-    successMessage.textContent = "Photo captured successfully!"
-    document.body.appendChild(successMessage)
+    // Send photo to backend for detection
+    try {
+      const response = await fetch('http://localhost:5000/detect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: base64Image }),
+      });
 
-    setTimeout(() => {
-      document.body.removeChild(successMessage)
-      setIsCapturing(false)
-    }, 2000)
+      const result = await response.json();
+      console.log(result.detections); // Log the detections to see results
+
+      // After getting results, you can display them or handle further
+      onPhotoCapture(imageDataUrl, currentLocation);
+
+      const successMessage = document.createElement("div")
+      successMessage.className = "capture-success"
+      successMessage.textContent = "Photo captured successfully!"
+      document.body.appendChild(successMessage)
+
+      setTimeout(() => {
+        document.body.removeChild(successMessage)
+        setIsCapturing(false)
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert("Failed to send photo for detection.");
+    } finally {
+      setIsCapturing(false);
+    }
   }
 
   return (
