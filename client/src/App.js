@@ -9,12 +9,13 @@ function App() {
   const [capturedPhotos, setCapturedPhotos] = useState([])
   const mapRef = useRef(null)
 
-  const handlePhotoCapture = (photoData, location) => {
+  const handlePhotoCapture = (photoData, location, detectedType) => {
     const newPhoto = {
       id: Date.now(),
       image: photoData,
       location,
       timestamp: new Date().toLocaleString(),
+      type: detectedType || 'photo',
     }
 
     setCapturedPhotos((prev) => [...prev, newPhoto])

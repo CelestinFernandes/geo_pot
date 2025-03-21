@@ -228,6 +228,7 @@ select {
 .photo-gallery {
   margin-top: 30px;
   width: 100%;
+  padding-bottom: 15%;
 }
 
 .gallery-grid {
@@ -401,5 +402,17 @@ select {
 
   .camera-preview {
     max-height: 40vh;
+  }
+
+  .annotated-image-container {
+    margin-top: 20px;
+  }
+
+  .annotated-image {
+    width: 100%; /* Responsive width */
+    max-width: 640px; /* Max size for larger displays */
+    height: auto; /* Maintain aspect ratio */
+    border: 2px solid #3498db; /* Optional styling */
+    border-radius: 10px; /* Rounded corners */
   }
 }

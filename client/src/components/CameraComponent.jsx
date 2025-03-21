@@ -7,6 +7,7 @@ const CameraComponent = ({ onPhotoCapture }) => {
   const [isCapturing, setIsCapturing] = useState(false)
   const [currentLocation, setCurrentLocation] = useState(null)
   const [locationError, setLocationError] = useState(null)
+  const [annotatedImage, setAnnotatedImage] = useState(null) // State for storing annotated image
   const videoRef = useRef(null)
   const streamRef = useRef(null)
 
@@ -122,6 +123,9 @@ const CameraComponent = ({ onPhotoCapture }) => {
       const result = await response.json();
       console.log(result.detections); // Log the detections to see results
 
+      // Set the annotated image to display it
+      setAnnotatedImage(`data:image/jpeg;base64,${result.annotated_image}`);
+
       // After getting results, you can display them or handle further
       onPhotoCapture(imageDataUrl, currentLocation);
 
@@ -166,6 +170,13 @@ const CameraComponent = ({ onPhotoCapture }) => {
               <p> Current Location: {currentLocation[0].toFixed(15)}, {currentLocation[1].toFixed(15)} </p>
             </div>
           )}
+        </div>
+      )}
+      {/* Display the annotated image if available */}
+      {annotatedImage && (
+        <div className="annotated-image-container">
+          <h3>Detection Results:</h3>
+          <img src={annotatedImage} alt="Annotated Result" className="annotated-image" />
         </div>
       )}
     </div>
