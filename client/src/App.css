@@ -281,30 +281,24 @@ select {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
+  from {opacity: 0;
   }
-  to {
-    opacity: 1;
+  to {opacity: 1;
   }
 }
 
 @keyframes fadeOut {
-  from {
-    opacity: 1;
+  from {opacity: 1;
   }
-  to {
-    opacity: 0;
+  to {opacity: 0;
   }
 }
 
 /* Photo popup styles */
-.photo-popup {
-  text-align: center;
+.photo-popup {text-align: center;
 }
 
-.photo-popup img {
-  border-radius: 4px;
+.photo-popup img {border-radius: 4px;
 }
 
 .photo-popup p {
@@ -333,8 +327,7 @@ select {
     padding: 30px;
   }
 
-  .map-container {
-    border-bottom: none;
+  .map-container {border-bottom: none;
   }
 }
 
@@ -357,12 +350,10 @@ select {
     margin-bottom: 5px;
   }
 
-  select {
-    grid-column: 1 / -1; /* Full width for select */
+  select { grid-column: 1 / -1; /* Full width for select */
   }
 
-  .map-section {
-    height: 60vh; /* More map visibility on mobile */
+  .map-section {height: 60vh; /* More map visibility on mobile */
   }
 
   .camera-preview {
@@ -387,8 +378,7 @@ select {
     height: 50vh; /* Slightly smaller map on very small devices */
   }
 
-  .map-controls {
-    padding: 8px;
+  .map-controls {padding: 8px;
   }
 
   .map-controls button {
@@ -396,21 +386,18 @@ select {
     font-size: 12px;
   }
 
-  .camera-component {
-    padding: 10px;
+  .camera-component {padding: 10px;
   }
 
-  .camera-preview {
-    max-height: 40vh;
+  .camera-preview {max-height: 40vh;
   }
 
-  .annotated-image-container {
-    margin-top: 20px;
+  .annotated-image-container {margin-top: 20px;
   }
 
   .annotated-image {
     width: 100%; /* Responsive width */
-    max-width: 640px; /* Max size for larger displays */
+    max-width: 440px; /* Max size for larger displays */
     height: auto; /* Maintain aspect ratio */
     border: 2px solid #3498db; /* Optional styling */
     border-radius: 10px; /* Rounded corners */
