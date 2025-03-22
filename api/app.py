@@ -2,22 +2,20 @@
 # import math
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 from ultralytics import YOLO
 import numpy as np
 import base64
 import cv2
-import math
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
 # Load the YOLO model
 model = YOLO('../model/epoch175.pt')
 
 @app.route('/detect', methods=['POST'])
 def detect():
-    # Get image from request
     data = request.json
     image_data = data['image']
     
@@ -28,38 +26,45 @@ def detect():
 
     # Process image with YOLO
     results = model(img, stream=True)
-    class_names = ['Longitudinal Crack', 'Transverse Crack', 'Alligator Crack', 'Pothole'] 
+    class_names = ['Longitudinal Crack', 'Transverse Crack', 'Alligator Crack', 'Pothole']
     
     detections = []
 
     for r in results:
         boxes = r.boxes
         for box in boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])  # bounding box
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
             
-            # Use item() to convert tensor to a Python number
-            conf = box.conf[0].item()  # confidence
-            conf = round(conf, 2)  # now you can round it
+            conf = round(box.conf[0].item(), 2)
+            cls = int(box.cls[0])
+            
+            # Extract detection type for icon mapping
+            class_name = class_names[cls]
+            if class_name == 'Pothole':
+                detection_type = 'Pothole'
+            else:
+                detection_type = class_name.split()[0]  # Get first word for crack types
 
-            cls = int(box.cls[0])  # class
-            label = f"{class_names[cls]} {conf}"
+            label = f"{class_name} {conf}"
 
-            # Draw bounding box on the image
-            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Green bounding box
+            # Draw bounding box
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             detections.append({
                 "box": [x1, y1, x2, y2],
-                "label": label
+                "label": label,
+                "type": detection_type,
+                "confidence": float(conf)
             })
-    
-    # Encode the image with bounding boxes back to base64 for response
+
+    # Encode annotated image
     _, buffer = cv2.imencode('.jpeg', img)
     annotated_image_data = base64.b64encode(buffer).decode('utf-8')
 
     return jsonify({
         "detections": detections,
-        "annotated_image": annotated_image_data 
+        "annotated_image": annotated_image_data
     })
 
 if __name__ == "__main__":
