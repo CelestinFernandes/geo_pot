@@ -9,21 +9,33 @@ function App() {
   const [capturedPhotos, setCapturedPhotos] = useState([])
   const mapRef = useRef(null)
 
-  const handlePhotoCapture = (photoData, location, detectedType) => {
+  const handlePhotoCapture = (photoData, location, photoId, hasDetections) => {
     const newPhoto = {
-      id: Date.now(),
+      id: photoId,
       image: photoData,
       location,
       timestamp: new Date().toLocaleString(),
-      type: detectedType || 'photo',
+      type: 'photo',
+      showMarker: !hasDetections // Show marker only if no detections
     }
 
-    setCapturedPhotos((prev) => [...prev, newPhoto])
+    setCapturedPhotos((prev) => {
+      // Prevent duplicates
+      const exists = prev.some(photo => photo.id === photoId)
+      return exists ? prev : [...prev, newPhoto]
+    })
 
-    // Focus on new location
     if (mapRef.current && location) {
       mapRef.current.flyToLocation(location)
     }
+  }
+
+  const hideCameraMarker = (photoId) => {
+    setCapturedPhotos(prev => 
+      prev.map(photo => 
+        photo.id === photoId ? { ...photo, showMarker: false } : photo
+      )
+    )
   }
 
   return (
@@ -31,7 +43,7 @@ function App() {
       <div className="map-section">
         <MapComponent
           ref={mapRef}
-          capturedPhotos={capturedPhotos}
+          capturedPhotos={capturedPhotos.filter(photo => photo.showMarker)}
           onDeleteLastPhoto={() => setCapturedPhotos((prev) => prev.slice(0, -1))}
           onDeletePhoto={(photoId) => setCapturedPhotos((prev) => prev.filter((photo) => photo.id !== photoId))}
         />
@@ -40,7 +52,11 @@ function App() {
       <div className="content-section">
         <h2>Capture Location & Photo</h2>
         <p>Take a photo to mark your current location on the map</p>
-        <CameraComponent onPhotoCapture={handlePhotoCapture} />
+        <CameraComponent 
+          onPhotoCapture={handlePhotoCapture}
+          mapRef={mapRef}
+          onHideCameraMarker={hideCameraMarker}
+        />
         <PhotoGallery
           photos={capturedPhotos}
           onDeletePhoto={(photoId) => setCapturedPhotos((prev) => prev.filter((photo) => photo.id !== photoId))}

@@ -11,7 +11,7 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: "/images/marker-icon-2x.png",
   iconUrl: "/images/marker-icon.png",
   shadowUrl: "/images/marker-shadow.png",
-})
+});
 
 // Create custom icons with React components
 const createIcon = (emoji) =>
@@ -24,7 +24,7 @@ const createIcon = (emoji) =>
 
 const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDeletePhoto }, ref) => {
   const [markers, setMarkers] = useState([])
-  const [selectedType, setSelectedType] = useState("crack")
+  const [selectedType, setSelectedType] = useState("Pothole")
   const [mapCenter] = useState([19.125, 72.9])
   const mapRef = useRef()
 
@@ -35,12 +35,15 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     Pothole: createIcon('🕳'),
     photo: createIcon("📷"),
     search: createIcon("📍"),
+    default: createIcon('📍'),
   }
 
   useImperativeHandle(ref, () => ({
     flyToLocation: (location) => {
       if (mapRef.current) mapRef.current.setView(location, 16)
     },
+    addDetectionMarker: (marker) => {setMarkers((prev) => [...prev, marker])
+    }
   }))
 
   const MapClickHandler = () => {
@@ -106,34 +109,42 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
           <Marker
             key={marker.id}
             position={marker.position}
-            icon={icons[marker.type]}
+            icon={icons[marker.type]|| icons.default} 
             eventHandlers={{
               click: (e) => e.originalEvent.view.L.DomEvent.stopPropagation(e),
             }}
           >
             <Popup>
               <b>{marker.type.charAt(0).toUpperCase() + marker.type.slice(1)}</b>
+              {marker.photoData && (
+                <>
+                <div className="photo-popup">
+                  <img src={marker.photoData.image} alt="Detection" style={{ width: "150px", height: "auto", marginBottom: "8px" }}/>
+                  <p>Lat: {marker.photoData.location[0].toFixed(7)}</p>
+                  <p>Lng: {marker.photoData.location[1].toFixed(7)}</p>
+                  <p>{marker.photoData.timestamp}</p>
+                </div>
+              </>
+            )}
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   e.nativeEvent.stopImmediatePropagation()
-                  deleteMarker(marker.id)
-                }}
-              > Delete </button>
+                  deleteMarker(marker.id)}}> Delete </button>
             </Popup>
           </Marker>
         ))}
 
         {capturedPhotos.map((photo) => (
-          <Marker key={`photo-${photo.id}`} position={photo.location} icon={icons[photo.type] || icons.photo}>
+          <Marker key={`photo-${photo.id}`} position={photo.location} icon={icons[photo.type]}>
             <Popup>
               <div className="photo-popup">
                 <img src={photo.image || "/placeholder.svg"} alt="Captured"
                   style={{ width: "150px", height: "auto", marginBottom: "8px" }}
                 />
                 <p> <b>Photo captured at:</b> </p>
-                <p>Lat: {photo.location[0].toFixed(6)}</p>
-                <p>Lng: {photo.location[1].toFixed(6)}</p>
+                <p>Lat: {photo.location[0].toFixed(7)}</p>
+                <p>Lng: {photo.location[1].toFixed(7)}</p>
                 <p>{photo.timestamp}</p>
                 <button onClick={() => onDeletePhoto(photo.id)}>Delete</button>
               </div>
