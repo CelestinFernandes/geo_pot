@@ -1,14 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/
 
-/node_modules  # Ignores root node_modules
-/node_modules/ # Alternative syntax (same result)
-.pnp
-.pnp.js
+### Dependencies ###
+**/node_modules/
 
 /coverage
 /build
 
-.env*.local  # Shortcut for all .env files ending with .local
+### Environment Files ###
+.env*.local
 .env*.test
 .env*.development
 .env*.production
