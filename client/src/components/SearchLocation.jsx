@@ -1,4 +1,3 @@
-"use client"
 import { useState } from "react"
 
 const SearchLocation = ({ onSearch }) => {
@@ -32,14 +31,13 @@ const SearchLocation = ({ onSearch }) => {
     <div className="search-container">
       <div className="search-input-group">
         <input
-          type="text"
-          placeholder="Search Location"
+          type="text" placeholder="Search Location"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value)
             setError("")
           }}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+          onBeforeInput={(e) => e.key === "Enter" && handleSearch()}
         />
         <button onClick={handleSearch} className="search-icon-button">🔍</button>
       </div>
@@ -47,5 +45,4 @@ const SearchLocation = ({ onSearch }) => {
     </div>
   )
 }
-
 export default SearchLocation
