@@ -1,7 +1,7 @@
 # import cvzone
 # import math
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from ultralytics import YOLO
 import numpy as np
@@ -11,39 +11,21 @@ import cv2
 app = Flask(__name__)
 CORS(app)
 
-# Load the YOLO model
 model = YOLO('../model/epoch175.pt')
 
-@app.route('/detect', methods=['POST'])
-def detect():
-    data = request.json
-    image_data = data['image']
-    
-    # Decode image
-    img_data = base64.b64decode(image_data)
-    img_array = np.frombuffer(img_data, np.uint8)
-    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
-    # Process image with YOLO
-    results = model(img, stream=True)
-    class_names = ['Longitudinal Crack', 'Transverse Crack', 'Alligator Crack', 'Pothole']
-    
+class_names = ['Longitudinal Crack', 'Transverse Crack', 'Alligator Crack', 'Pothole']
+def process_image(img):
+    results = model(img, stream=True)  # Object detection results
     detections = []
 
     for r in results:
         boxes = r.boxes
         for box in boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            
-            conf = round(box.conf[0].item(), 2)
-            cls = int(box.cls[0])
-            
-            # Extract detection type for icon mapping
-            class_name = class_names[cls]
-            if class_name == 'Pothole':
-                detection_type = 'Pothole'
-            else:
-                detection_type = class_name.split()[0]  # Get first word for crack types
+            x1, y1, x2, y2 = map(int, box.xyxy[0]) 
+            conf = round(box.conf[0].item(), 2) 
+            cls = int(box.cls[0])  # class index
+            class_name = class_names[cls] 
+            detection_type = 'Pothole' if class_name == 'Pothole' else class_name.split()[0] 
 
             label = f"{class_name} {conf}"
 
@@ -61,12 +43,45 @@ def detect():
     # Encode annotated image
     _, buffer = cv2.imencode('.jpeg', img)
     annotated_image_data = base64.b64encode(buffer).decode('utf-8')
+    return detections, annotated_image_data
+
+@app.route('/detect', methods=['POST'])
+def detect():
+    data = request.json
+    image_data = data['image']
+    
+    # Decode image
+    img_data = base64.b64decode(image_data)
+    img_array = np.frombuffer(img_data, np.uint8)
+    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+    # Process image, get detections n annotated image
+    detections, annotated_image_data = process_image(img)
 
     return jsonify({
         "detections": detections,
         "annotated_image": annotated_image_data
     })
 
+@app.route('/detect_video', methods=['POST'])
+def detect_video():
+    def generate():
+        cap = cv2.VideoCapture(0)
+        while True:
+            success, frame = cap.read()
+            if not success:
+                break
+            # Process the frame and get detections
+            detections, _ = process_image(frame)
+
+            # Convert the frame into a byte stream and yield it for streaming
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    return Response(generate(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 if __name__ == "__main__":
     app.run(debug=True)
 
