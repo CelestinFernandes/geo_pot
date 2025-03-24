@@ -41,8 +41,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="map-section">
-        <MapComponent
-          ref={mapRef}
+        <MapComponent ref={mapRef}
           capturedPhotos={capturedPhotos.filter(photo => photo.showMarker)}
           onDeleteLastPhoto={() => setCapturedPhotos((prev) => prev.slice(0, -1))}
           onDeletePhoto={(photoId) => setCapturedPhotos((prev) => prev.filter((photo) => photo.id !== photoId))}
@@ -51,7 +50,7 @@ function App() {
 
       <div className="content-section">
         <h2>Capture Location & Photo</h2>
-        <p>Take a photo to mark your current location on the map</p>
+        <p>Take a photo to mark the Pothole/Type of Crack</p>
         <CameraComponent 
           onPhotoCapture={handlePhotoCapture}
           mapRef={mapRef}
