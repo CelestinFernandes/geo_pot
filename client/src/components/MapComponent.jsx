@@ -1,4 +1,3 @@
-"use client"
 import { useState, useCallback, useRef, forwardRef, useImperativeHandle } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet"
 import L from "leaflet"
@@ -19,7 +18,7 @@ const createIcon = (emoji) =>
     className: "custom-icon",
     html: `<div style="font-size: 32px; color: #e74c3c">${emoji}</div>`,
     iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconAnchor: [16, 16], //pt of the icon-center of 32x32
   })
 
 const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDeletePhoto }, ref) => {
@@ -47,8 +46,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
   }))
 
   const MapClickHandler = () => {
-    useMapEvents({
-      click: (e) => {
+    useMapEvents({click: (e) => {
         if (!e.originalEvent.propagatedFromMarker && !e.originalEvent._simulated) {
           setMarkers((prev) => [
             ...prev,
@@ -94,7 +92,7 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
         center={mapCenter}
         zoom={13}
         style={{ height: "100%", width: "100%" }}
-        tap={false}
+        tap={false} //mobile zoom remove
         ref={mapRef}
         zoomControl={window.innerWidth > 768}
       >
@@ -167,5 +165,4 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
     </div>
   )
 })
-
 export default MapComponent
