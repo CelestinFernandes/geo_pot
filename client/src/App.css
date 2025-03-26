@@ -340,7 +340,7 @@ select {
     max-width: none;
     background: rgba(255, 255, 255, 0.95); /* More opaque for better visibility */
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns for controls */
+    grid-template-columns: 1fr; 
     gap: 8px;
     padding: 10px;
   }
@@ -401,5 +401,78 @@ select {
     height: auto; /* Maintain aspect ratio */
     border: 2px solid #3498db; /* Optional styling */
     border-radius: 10px; /* Rounded corners */
+  }
+  
+  .video-mode-toggle {
+    background: #9b59b6;
+    color: white;
+    margin: 10px 0;
+  }
+
+  .video-mode-toggle.active {
+    background: #8e44ad;
+  }
+
+  .video-detections {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .video-detections h4 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+  }
+
+  .video-detections ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .video-detections li {
+    padding: 5px;
+    background: #f8f9fa;
+    margin: 3px 0;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  /* Add these styles for video support */
+  .video-preview {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+  }
+
+  .video-preview h4 {
+   margin: 0 0 10px 0;
+   color: #2c3e50;
+  }
+
+  .save-video-button {
+    background: #27ae60;
+    color: white;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .video-mode-toggle {
+    background: #e67e22;
+    color: white;
+  }
+
+  .video-mode-toggle.active {
+    background: #d35400;
+  }
+
+  .video-detections li {
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid #eee;
   }
 }

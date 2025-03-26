@@ -160,7 +160,6 @@ const MapComponent = forwardRef(({ capturedPhotos = [], onDeleteLastPhoto, onDel
           <option value="Pothole">🕳 Pothole</option>
         </select>
         <button onClick={deleteLastMarker}>🗑️ Delete Last</button>
-        <button onClick={() => setMarkers([])}>🧹 Clear All</button>
       </div>
     </div>
   )
