@@ -340,7 +340,7 @@ select {
     max-width: none;
     background: rgba(255, 255, 255, 0.95); /* More opaque for better visibility */
     display: grid;
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr; /* Two columns for controls */
     gap: 8px;
     padding: 10px;
   }
